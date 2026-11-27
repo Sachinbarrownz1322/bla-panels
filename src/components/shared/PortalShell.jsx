@@ -69,10 +69,19 @@ export default function PortalShell({
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center space-y-2">
-          <div className="w-8 h-8 border-4 border-[#2E3192] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs font-semibold text-slate-600">Verifying BLA Session...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F4F7FC] via-white to-[#E0F2FE]">
+        <div className="text-center space-y-4">
+          <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border-4 border-[#2E3192]/15 border-t-[#2E3192] animate-spin" />
+            <div className="absolute inset-2 rounded-full border-4 border-[#0071BC]/15 border-b-[#0071BC] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.4s' }} />
+            <div className="w-14 h-14 rounded-full bg-white shadow-md flex items-center justify-center p-2">
+              <img src="/images/logo/logo.png" alt="BLA" className="w-full h-full object-contain animate-pulse" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-extrabold text-[#2E3192] tracking-wide">Barrownz Learning Academy</p>
+            <p className="text-[11px] font-semibold text-[#0071BC] animate-pulse">Preparing your workspace...</p>
+          </div>
         </div>
       </div>
     );
