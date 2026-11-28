@@ -21,7 +21,7 @@ export default function AdminUsersPage() {
   const [accessEmail, setAccessEmail] = useState('');
   const [accessVerified, setAccessVerified] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-  const [editForm, setEditForm] = useState({ name: '', phone: '' });
+  const [editForm, setEditForm] = useState({ name: '', phone: '', roleName: 'STUDENT' });
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
 
@@ -55,7 +55,8 @@ export default function AdminUsersPage() {
   }, [otpCooldown]);
 
   const isSuperAdmin = me?.roleName === 'SUPER_ADMIN';
-  const canCreateAdmin = isSuperAdmin && adminCount < maxAdmins;
+  const canManageAdmin = isSuperAdmin || me?.roleName === 'ADMIN';
+  const canCreateAdmin = canManageAdmin && adminCount < maxAdmins;
 
   useEffect(() => {
     if (!canCreateAdmin && form.roleName === 'ADMIN') {
@@ -179,9 +180,9 @@ export default function AdminUsersPage() {
     }
   };
 
-  // Users table displays ONLY Students & Trainers (never Super Admin or Admin)
+  // Users table displays Admins, Trainers & Students (never Super Admin)
   const visibleUsers = users.filter((u) => {
-    if (u.roleName !== 'STUDENT' && u.roleName !== 'TRAINER') return false;
+    if (u.roleName === 'SUPER_ADMIN') return false;
     if (roleFilter === 'ALL') return true;
     return u.roleName === roleFilter;
   });
@@ -333,13 +334,14 @@ export default function AdminUsersPage() {
         </div>
       </form>
 
-      {/* Filter Bar: Students vs Trainers (No Admin/SuperAdmin shown) */}
+      {/* Filter Bar: Admins, Trainers & Students (No Super Admin shown) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="inline-flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 text-xs">
           {[
-            { key: 'ALL', label: 'All (Students & Trainers)' },
-            { key: 'STUDENT', label: 'Students' },
+            { key: 'ALL', label: 'All' },
+            { key: 'ADMIN', label: 'Admins' },
             { key: 'TRAINER', label: 'Trainers' },
+            { key: 'STUDENT', label: 'Students' },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -378,7 +380,7 @@ export default function AdminUsersPage() {
             {visibleUsers.length === 0 ? (
               <tr>
                 <td colSpan={7} className="p-6 text-center text-slate-500">
-                  No students or trainers found for this filter.
+                  No users found for this filter.
                 </td>
               </tr>
             ) : (
@@ -398,7 +400,7 @@ export default function AdminUsersPage() {
                     <button
                       onClick={() => {
                         setEditingUser(u);
-                        setEditForm({ name: u.name, phone: u.phone });
+                        setEditForm({ name: u.name, phone: u.phone, roleName: u.roleName });
                       }}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-sky-50 text-[#0071BC] font-semibold hover:bg-sky-100"
                     >
@@ -447,6 +449,20 @@ export default function AdminUsersPage() {
                   onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
                   className="w-full border border-slate-200 rounded-lg px-3 py-2"
                 />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Role</label>
+                <select
+                  value={editForm.roleName}
+                  onChange={(e) => setEditForm({ ...editForm, roleName: e.target.value })}
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 bg-white"
+                >
+                  <option value="STUDENT">STUDENT</option>
+                  <option value="TRAINER">TRAINER</option>
+                  {canManageAdmin && (editingUser.roleName === 'ADMIN' || canCreateAdmin) && (
+                    <option value="ADMIN">ADMIN</option>
+                  )}
+                </select>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setEditingUser(null)} className="px-4 py-2 rounded-lg border border-slate-200 font-semibold">
